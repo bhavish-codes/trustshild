@@ -60,6 +60,14 @@ export default function CandidateDetailPage() {
   const aadhaarLog = candidate.verificationLogs?.find(l => l.verificationType === "AADHAAR");
   const panLog = candidate.verificationLogs?.find(l => l.verificationType === "PAN");
 
+  const passedCount = [
+    aadhaarLog?.verificationStatus === "VERIFIED",
+    panLog?.verificationStatus === "VERIFIED"
+  ].filter(Boolean).length;
+
+  const confidenceColor = passedCount === 2 ? "#16a34a" : passedCount === 1 ? "#d97706" : "#dc2626";
+  const confidenceText = `${passedCount}/2 verification passed`;
+
   return (
     <div style={{ background: "#f7f8fa", minHeight: "100vh" }}>
       {/* 1. Header Alert Banner if check failed or verified */}
@@ -207,8 +215,8 @@ export default function CandidateDetailPage() {
                     <p style={{ fontSize: "10.5px", fontWeight: "600", color: "#8b95a8", textTransform: "uppercase", marginBottom: "4px" }}>
                       Identity Match Confidence
                     </p>
-                    <p style={{ fontSize: "28px", fontWeight: "700", color: aadhaarLog.verificationStatus === "VERIFIED" ? "#16a34a" : "#dc2626" }}>
-                      {aadhaarLog.verificationStatus === "VERIFIED" ? "98%" : "62%"}
+                    <p style={{ fontSize: "28px", fontWeight: "700", color: confidenceColor }}>
+                      {confidenceText}
                     </p>
                   </div>
 
