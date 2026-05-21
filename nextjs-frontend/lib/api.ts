@@ -2,8 +2,13 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
+let rawURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+if (rawURL && !rawURL.endsWith("/api") && !rawURL.endsWith("/api/")) {
+  rawURL = rawURL.replace(/\/$/, "") + "/api";
+}
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api",
+  baseURL: rawURL,
   headers: { "Content-Type": "application/json" },
 });
 

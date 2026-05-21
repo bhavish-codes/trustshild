@@ -28,7 +28,17 @@ app.use(express.urlencoded({ extended: true}));
 
 app.use("/mock-api", mockRoutes);
 
-app.use("/api", apiRoutes);
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Background Verification Platform API is running successfully.",
+    environment: process.env.NODE_ENV || "development",
+    endpoints: {
+      api: "/api",
+      mockVerification: "/mock-api"
+    }
+  });
+});
 
 app.use((req, res) => {
   res.status(404).json({
