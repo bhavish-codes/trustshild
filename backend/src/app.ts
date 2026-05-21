@@ -42,15 +42,6 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/debug-db", (req, res) => {
-  const dbUrl = process.env.DATABASE_URL || "not set";
-  const maskedUrl = dbUrl.replace(/:([^:@]+)@/, ":****@");
-  res.status(200).json({
-    status: "success",
-    databaseUrl: maskedUrl,
-    nodeEnv: process.env.NODE_ENV,
-  });
-});
 
 app.use((req, res) => {
   res.status(404).json({
