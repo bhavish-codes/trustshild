@@ -1,0 +1,34 @@
+services:
+  # 1. Backend Express Web Service
+  - type: web
+    name: trustshield-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true # Generates a secure random JWT secret automatically
+      - key: DATABASE_URL
+        sync: false # User will paste their MongoDB Atlas URL here
+
+  # 2. Frontend Next.js Web Service (if hosted on Render, though Vercel is preferred)
+  - type: web
+    name: trustshield-frontend
+    env: node
+    plan: free
+    rootDir: nextjs-frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://trustshield-backend.onrender.com/api # Automatically points to backend
