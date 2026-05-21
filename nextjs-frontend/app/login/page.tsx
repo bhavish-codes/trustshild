@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,9 +18,20 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setAuth } = useAuthStore();
+  const { setAuth, isAuthenticated } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("trustshield_token");
+      if (token || isAuthenticated) {
+        setIsRedirecting(true);
+        router.replace("/dashboard");
+      }
+    }
+  }, [isAuthenticated, router]);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -45,6 +56,20 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  if (isRedirecting || isAuthenticated) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#f7f8fa", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+          <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ color: "#1a6bfa" }}>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />
+            <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+          <p style={{ fontSize: "14px", color: "#5a6478", fontWeight: "500" }}>Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#f7f8fa", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>

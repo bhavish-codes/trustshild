@@ -1,5 +1,6 @@
 // lib/api.ts — Axios instance with auth token injection
 import axios from "axios";
+import { useAuthStore } from "@/store/authStore";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api",
@@ -20,8 +21,7 @@ api.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      localStorage.removeItem("trustshield_token");
-      localStorage.removeItem("trustshield_user");
+      useAuthStore.getState().logout();
       window.location.href = "/login";
     }
     return Promise.reject(error);
