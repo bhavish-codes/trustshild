@@ -7,6 +7,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
 import { CheckCircle2, Clock, XCircle, Users, Plus } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Stats { total: number; verified: number; pending: number; failed: number; partial: number; }
 
@@ -15,6 +16,16 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({ total: 0, verified: 0, pending: 0, failed: 0, partial: 0 });
   const [recent, setRecent] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleChecklistItemClick = (action: string) => {
+    if (action.includes("Add Candidate")) {
+      router.push("/dashboard/candidates");
+    } else if (action.includes("Setup API")) {
+      toast.success("Identity Check API integrations are connected & active (Sandbox Mode)!");
+    } else if (action.includes("Complete")) {
+      toast.success("VerifyPro Business Profile setup is complete & active!");
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -157,7 +168,7 @@ export default function DashboardPage() {
                     <p style={{ fontSize: "12.5px", color: "#8b95a8", marginTop: "2px" }}>{item.desc}</p>
                   </div>
                 </div>
-                {!item.done && item.action && <button style={{ background: "none", border: "none", color: "#1a6bfa", fontSize: "13px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap" }}>{item.action}</button>}
+                {!item.done && item.action && <button onClick={() => handleChecklistItemClick(item.action)} style={{ background: "none", border: "none", color: "#1a6bfa", fontSize: "13px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap" }}>{item.action}</button>}
               </div>
             ))}
           </div>

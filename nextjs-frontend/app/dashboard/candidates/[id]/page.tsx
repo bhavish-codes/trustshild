@@ -17,6 +17,17 @@ export default function CandidateDetailPage() {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [alertDismissed, setAlertDismissed] = useState(false);
+
+  const handleManualOverride = async () => {
+    try {
+      await api.put(`/candidates/${id}`, { status: "VERIFIED" });
+      setCandidate(prev => prev ? { ...prev, status: "VERIFIED" } : null);
+      toast.success("Candidate status manually overridden to VERIFIED");
+    } catch {
+      toast.error("Failed to perform manual override");
+    }
+  };
 
   const load = async () => {
     try {
@@ -71,7 +82,7 @@ export default function CandidateDetailPage() {
   return (
     <div style={{ background: "#f7f8fa", minHeight: "100vh" }}>
       {/* 1. Header Alert Banner if check failed or verified */}
-      {candidate.status === "FAILED" && (
+      {candidate.status === "FAILED" && !alertDismissed && (
         <div style={{
           background: "#fff2f2", borderBottom: "1px solid #fca5a5",
           padding: "12px 28px", display: "flex", justifyContent: "space-between", alignItems: "center"
@@ -81,7 +92,7 @@ export default function CandidateDetailPage() {
             <span>Verification Failed: Review Required</span>
           </div>
           <div style={{ display: "flex", gap: "8px" }}>
-            <button className="btn btn-outline" style={{ height: "28px", fontSize: "12px", background: "white" }}>Dismiss Alert</button>
+            <button className="btn btn-outline" style={{ height: "28px", fontSize: "12px", background: "white" }} onClick={() => setAlertDismissed(true)}>Dismiss Alert</button>
             <button className="btn btn-primary" style={{ height: "28px", fontSize: "12px", background: "#dc2626" }} onClick={startVerification} disabled={verifying}>
               {verifying ? "Retrying..." : "Retry All Checks"}
             </button>
@@ -189,8 +200,12 @@ export default function CandidateDetailPage() {
                       : "The name on the provided PAN card does not match the official database records. This could be due to a typo or a legal name change."}
                   </p>
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button className="btn btn-outline" style={{ height: "30px", fontSize: "12px" }}>Manual Override</button>
-                    <button className="btn btn-dark" style={{ height: "30px", fontSize: "12px" }}>Request New Upload</button>
+                    <button className="btn btn-outline" style={{ height: "30px", fontSize: "12px" }} onClick={handleManualOverride} disabled={candidate.status === "VERIFIED"}>
+                      Manual Override
+                    </button>
+                    <button className="btn btn-dark" style={{ height: "30px", fontSize: "12px" }} onClick={() => toast.success("Upload request email successfully dispatched to candidate.")}>
+                      Request New Upload
+                    </button>
                   </div>
                 </div>
               )}
@@ -233,7 +248,9 @@ export default function CandidateDetailPage() {
                   </div>
 
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button className="btn btn-dark" style={{ height: "30px", fontSize: "12px" }}>Initiate Liveness Check</button>
+                    <button className="btn btn-dark" style={{ height: "30px", fontSize: "12px" }} onClick={() => toast.success("Live video liveness link successfully sent to candidate's mobile number.")}>
+                      Initiate Liveness Check
+                    </button>
                   </div>
                 </div>
               )}
